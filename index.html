@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiago Higienização | Estética Automotiva em Acajutiba, BA</title>
+  <meta name="description" content="Higienização técnica e estética automotiva com Tiago em Acajutiba, BA. Limpeza a vapor a 160°C, descontaminação de pintura e proteção de interiores.">
+  
+  <!-- Open Graph / Meta Tags Sociais -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Tiago Higienização | Estética Automotiva em Acajutiba, BA">
+  <meta property="og:description" content="Higienização técnica e estética automotiva com Tiago em Acajutiba, BA. Limpeza a vapor a 160°C, descontaminação e proteção de pintura.">
+  <meta property="og:site_name" content="MG Estética Automotiva">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tiago Higienização | Estética Automotiva em Acajutiba, BA">
+  <meta name="twitter:description" content="Higienização técnica e estética automotiva com Tiago em Acajutiba, BA.">
+
+  <!-- Schema Markup (LocalBusiness JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutoDetailing",
+    "name": "MG Estética Automotiva - Tiago Higienização",
+    "image": "https://www.instagram.com/mgesteticaautomotiva/",
+    "telephone": "+5575999325145",
+    "url": "https://maps.google.com/?cid=8531081908279085757",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rua Ermírio Leandro, 436",
+      "addressLocality": "Acajutiba",
+      "addressRegion": "BA",
+      "postalCode": "48360-000",
+      "addressCountry": "BR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": -11.6617,
+      "longitude": -38.0197
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "08:00",
+        "closes": "18:00"
+      }
+    ],
+    "sameAs": [
+      "https://www.instagram.com/mgesteticaautomotiva/",
+      "https://maps.google.com/?cid=8531081908279085757"
+    ],
+    "priceRange": "$$$"
+  }
+  </script>
+
+  <!-- Google Fonts: Syne & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Camada 1 & 2: Vídeo de Fundo Fixo + Overlay Escuro Semitransparente -->
+  <div class="video-scrolly-container" aria-hidden="true">
+    <video
+      id="scrolly-video"
+      class="video-scrolly-element"
+      muted
+      playsinline
+      preload="auto"
+    >
+      <source src="videos/higienizacao-veicular.webm" type="video/webm">
+      <source src="/videos/higienizacao-veicular.webm" type="video/webm">
+      <source src="videos/higienizacao-veicular.mp4" type="video/mp4">
+      <source src="/videos/higienizacao-veicular.mp4" type="video/mp4">
+    </video>
+    <div class="video-scrolly-overlay"></div>
+  </div>
+
+  <!-- Cabeçalho Fixo Minimalista -->
+  <header class="header-navbar">
+    <div class="header-container">
+      <a href="#abertura" class="brand-link" aria-label="Ir para o início">
+        <span class="brand-eyebrow">ESTÉTICA AUTOMOTIVA</span>
+        <span class="brand-title">TIAGO <span>HIGIENIZAÇÃO</span></span>
+      </a>
+
+      <nav class="nav-phases" aria-label="Navegação por etapas do processo">
+        <a href="#abertura" class="nav-item is-active" data-phase="1">Diagnóstico</a>
+        <a href="#preparacao" class="nav-item" data-phase="2">Descontaminação</a>
+        <a href="#higienizacao" class="nav-item" data-phase="3">Interior</a>
+        <a href="#acabamento" class="nav-item" data-phase="4">Proteção</a>
+        <a href="#entrega" class="nav-item" data-phase="5">Entrega</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Container Principal das 5 Seções -->
+  <main class="scrolly-main-flow">
+
+    <!-- SEÇÃO 1: Abertura (Recepção e Diagnóstico) - Centralizada -->
+    <section id="abertura" class="flow-section section-center section-hero-abertura" data-step="1">
+      
+      <!-- Ícone do Instagram no alto da Hero -->
+      <a href="https://www.instagram.com/mgesteticaautomotiva/" target="_blank" rel="noopener noreferrer" class="hero-top-instagram-btn" aria-label="Abrir Instagram @mgesteticaautomotiva" title="Instagram @mgesteticaautomotiva">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </a>
+
+      <div class="section-content-wrap">
+        <h1 class="editorial-title hero-heading">
+          O cuidado que devolve a sensação de carro novo ao seu veículo
+        </h1>
+
+        <p class="editorial-lead">
+          A experiência de entrar em um carro completamente higienizado, com a aparência de quem acabou de sair da concessionária.
+        </p>
+
+        <div class="meta-indicators">
+          <div class="indicator-item">
+            <span class="indicator-val">100%</span>
+            <span class="indicator-label">Livre de Odores e Ácaros</span>
+          </div>
+          <div class="indicator-sep" aria-hidden="true"></div>
+          <div class="indicator-item">
+            <span class="indicator-val">BRILHO</span>
+            <span class="indicator-label">Pintura Protegida</span>
+          </div>
+          <div class="indicator-sep" aria-hidden="true"></div>
+          <div class="indicator-item">
+            <span class="indicator-val">ZERO</span>
+            <span class="indicator-label">Sensação de Carro Novo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: Preparação e Descontaminação - Alinhada à Esquerda -->
+    <section id="preparacao" class="flow-section section-left" data-step="2">
+      <div class="section-content-wrap">
+        <h2 class="editorial-title">
+          Lavagem técnica e <br>revitalização externa
+        </h2>
+
+        <p class="editorial-lead">
+          Limpeza minuciosa com snow foam, remoção de contaminações ferrosas e restauração do brilho natural da lataria e faróis.
+        </p>
+
+        <div class="specs-list">
+          <div class="spec-line">
+            <span class="spec-title">Pré-lavagem com snow foam de alta lubrificação e pH neutro</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Descontaminação ferrosa e química de rodas e carroceria</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Passagem de clay bar e pincelamento detalhado de cantos e emblemas</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Lavagem técnica de motor e restauração de plásticos externos</span>
+          </div>
+        </div>
+      </div>
+      <div class="viewport-stage-free-zone" aria-hidden="true"></div>
+    </section>
+
+    <!-- SEÇÃO 3: Higienização Técnica do Interior - Alinhada à Direita -->
+    <section id="higienizacao" class="flow-section section-right" data-step="3">
+      <div class="viewport-stage-free-zone" aria-hidden="true"></div>
+
+      <div class="section-content-wrap">
+        <h2 class="editorial-title">
+          Higienização profunda <br>e oxi-sanitização
+        </h2>
+
+        <p class="editorial-lead">
+          Higienização térmica a vapor a 160°C para eliminar ácaros, fungos, bactérias e odores em bancos, carpetes e no ar condicionado.
+        </p>
+
+        <div class="specs-list">
+          <div class="spec-line">
+            <span class="spec-title">Vapor a 160°C em dutos de ar, forros, estofados e carpetes</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Limpeza e hidratação profunda de bancos de couro e tecidos</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Oxi-sanitização para purificação do ar e eliminação de odores</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Higienização completa de painel, portas e porta-malas</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: Acabamento e Proteção - Alinhada à Esquerda -->
+    <section id="acabamento" class="flow-section section-left" data-step="4">
+      <div class="section-content-wrap">
+        <h2 class="editorial-title">
+          Vitrificação, proteção <br>e acabamento premium
+        </h2>
+
+        <p class="editorial-lead">
+          Proteção de alto padrão com selantes cerâmicos e vitrificação para manter a pintura protegida e os interiores preservados.
+        </p>
+
+        <div class="specs-list">
+          <div class="spec-line">
+            <span class="spec-title">Vitrificação e selante hidrorrepelente para lataria e vidros</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Condicionamento acetinado com proteção UV em plásticos e borrachas</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Impermeabilização protetiva de bancos de tecido e carpetes</span>
+          </div>
+          <div class="spec-line">
+            <span class="spec-title">Proteção contra intempéries e preservação da cor original</span>
+          </div>
+        </div>
+      </div>
+      <div class="viewport-stage-free-zone" aria-hidden="true"></div>
+    </section>
+
+    <!-- SEÇÃO 5: Entrega e Atendimento - Centralizada -->
+    <section id="entrega" class="flow-section section-center" data-step="5">
+      <div class="section-content-wrap">
+        <h2 class="editorial-title hero-heading">
+          Conferência e <br class="br-desktop">entrega do veículo
+        </h2>
+
+        <p class="editorial-lead">
+          Conferimos cada detalhe do interior e do exterior antes de entregar para você, garantindo o carro totalmente limpo, higienizado e pronto para rodar.
+        </p>
+
+        <!-- Cards de Ação e Contato -->
+        <div class="contact-actions-deck">
+          <a href="https://wa.me/5575999325145?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20higieniza%C3%A7%C3%A3o%20veicular%20com%20o%20Tiago." target="_blank" rel="noopener noreferrer" class="contact-card highlight-whatsapp">
+            <div class="card-tag">ATENDIMENTO DIRETO</div>
+            <div class="card-heading">Conversar no WhatsApp</div>
+            <div class="card-meta">(75) 99932-5145 ↗</div>
+          </a>
+
+          <a href="https://maps.google.com/?cid=8531081908279085757" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <div class="card-tag">ENDEREÇO OFICIAL</div>
+            <div class="card-heading">Acajutiba, BA</div>
+            <div class="card-meta">Rua Ermírio Leandro, 436 ↗</div>
+          </a>
+
+          <a href="https://www.instagram.com/mgesteticaautomotiva/" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <div class="card-tag">PORTFÓLIO &amp; MÍDIA</div>
+            <div class="card-heading">@mgesteticaautomotiva</div>
+            <div class="card-meta">Acompanhe projetos no Instagram ↗</div>
+          </a>
+        </div>
+
+        <!-- Mapa Oficial do Google Maps (Onde ficava o FAQ) -->
+        <a href="https://maps.google.com/?cid=8531081908279085757" target="_blank" rel="noopener noreferrer" class="location-snapshot-card" aria-label="Abrir localização de MG Estética Automotiva no Google Maps">
+          <div class="map-graphic-layer">
+            <img src="mapa-localizacao.png" alt="Mapa de Localização MG Estética Automotiva - Rua Ermírio Leandro, 436, Acajutiba - BA" class="location-map-img" loading="lazy">
+            <div class="map-hover-hint">
+              <span>Abrir no Google Maps ↗</span>
+            </div>
+          </div>
+
+          <div class="snapshot-bottom-bar">
+            <div class="snapshot-details">
+              <span class="snapshot-tag-badge">LOCALIZAÇÃO OFICIAL • ACAJUTIBA, BA</span>
+              <span class="snapshot-headline">Rua Ermírio Leandro, 436, CEP 48360-000</span>
+            </div>
+            <span class="snapshot-action-btn">
+              <span>Abrir no Google Maps</span>
+              <span class="btn-arrow-icon" aria-hidden="true">↗</span>
+            </span>
+          </div>
+        </a>
+
+        <!-- Área Livre Final: Revelação Completa do Carro Limpo no Vídeo de Fundo -->
+        <div class="showroom-final-reveal-spacer" aria-hidden="true"></div>
+
+        <div class="footer-subtext">
+          <div class="footer-col-left">
+            <span>MG Estética Automotiva • Rua Ermírio Leandro, 436, Acajutiba, BA</span>
+            <span class="response-time-badge">⚡ Atendimento ágil: resposta em até 30 minutos</span>
+          </div>
+          <div class="footer-col-right">
+            <a href="privacidade.html" class="footer-privacy-link">Política de Privacidade (LGPD)</a>
+            <span>© 2026 Todos os direitos reservados.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Ícone Flutuante do WhatsApp (Apenas o ícone, persistente em todo o site) -->
+  <a href="https://wa.me/5575999325145?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20higieniza%C3%A7%C3%A3o%20veicular%20com%20o%20Tiago." target="_blank" rel="noopener noreferrer" class="whatsapp-persistent-btn" aria-label="Falar no WhatsApp com Tiago Higienização (75) 99932-5145" title="Conversar no WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+      <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.63c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.78.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.18-.47-.3z"/>
+    </svg>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+</html>

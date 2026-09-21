@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página Não Encontrada (404) | Tiago Higienização</title>
+  <meta name="robots" content="noindex, follow">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .error-hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 10;
+    }
+    .error-card {
+      max-width: 580px;
+      padding: 3rem 2.5rem;
+      background: rgba(18, 21, 26, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--hairline-border);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .error-code {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 10vw, 7rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent-titanium);
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+    }
+    .error-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .error-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .btn-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      background: var(--text-primary);
+      color: #090a0c;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.85rem 1.75rem;
+      border-radius: 9999px;
+      transition: var(--transition-fluid);
+    }
+    .btn-return:hover {
+      background: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-navbar">
+    <div class="header-container">
+      <a href="index.html" class="brand-link" aria-label="Ir para o início">
+        <span class="brand-eyebrow">ESTÉTICA AUTOMOTIVA</span>
+        <span class="brand-title">TIAGO <span>HIGIENIZAÇÃO</span></span>
+      </a>
+
+      <div class="header-actions">
+        <a href="https://wa.me/5575999325145?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20higieniza%C3%A7%C3%A3o%20veicular%20com%20o%20Tiago." target="_blank" rel="noopener noreferrer" class="btn-primary">
+          <span>WhatsApp Direto</span>
+          <span class="btn-icon" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="error-hero">
+    <div class="error-card">
+      <div class="error-code">404</div>
+      <h1 class="error-title">Página Não Encontrada</h1>
+      <p class="error-desc">O endereço que você tentou acessar não existe ou foi movido. Retorne à página principal para explorar nosso protocolo exclusivo de estética e higienização veicular.</p>
+      <a href="index.html" class="btn-return">
+        <span>← Voltar ao Início</span>
+      </a>
+    </div>
+  </main>
+
+</body>
+</html>

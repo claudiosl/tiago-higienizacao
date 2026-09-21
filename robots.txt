@@ -1,0 +1,6 @@
+# Robots.txt - MG Estética Automotiva / Tiago Higienização
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://mgesteticaautomotiva.com.br/sitemap.xml
