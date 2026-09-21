@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
  * TIAGO HIGIENIZAÇÃO - EXPERIÊNCIA CINEMATOGRÁFICA SCROLLYTELLING
- * Sincronização Ultra-Fluida de Vídeo com Scroll (Queue-Based Hardware Seeker)
+ * Motor Híbrido de Reprodução Sincronizada com Scroll (Active Pipeline Engine)
  * ==========================================================================
  */
 
@@ -15,71 +15,116 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!video || !mainFlow) return;
 
-  // Garante propriedades ideais
+  // Garante propriedades ideais de vídeo sem som e inline
   video.muted = true;
   video.defaultMuted = true;
   video.playsInline = true;
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
+  video.autoplay = false;
+  video.loop = false;
 
-  let isSeeking = false;
   let targetTime = 0;
-  let duration = 10;
-  let seekTimeout = null;
+  let videoDuration = 10;
+  let isSeeking = false;
+  let animationFrameId = null;
 
-  // Função para aplicar o seek com proteção de hardware queue
-  function performSeek() {
-    if (isSeeking) return;
-
-    const diff = Math.abs(video.currentTime - targetTime);
-    if (diff > 0.02) {
-      isSeeking = true;
-      try {
-        video.currentTime = targetTime;
-      } catch (e) {
-        isSeeking = false;
-      }
-
-      // Timeout de segurança caso o evento 'seeked' demore em aparelhos lentos
-      clearTimeout(seekTimeout);
-      seekTimeout = setTimeout(() => {
-        if (isSeeking) {
-          isSeeking = false;
-          performSeek();
-        }
-      }, 100);
+  function updateVideoDuration() {
+    if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+      videoDuration = video.duration;
     }
   }
 
-  // Quando o frame é decodificado pelo hardware, destrava e busca o próximo frame
+  // Destravamento de decodificação para navegadores restritivos (iOS/Safari/Android)
+  function unlockDecoder() {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Mantém vivo por uma fração de segundo para abrir os buffers de hardware
+          setTimeout(() => {
+            if (targetTime === 0 && Math.abs(video.currentTime) < 0.1) {
+              video.pause();
+            }
+          }, 150);
+        })
+        .catch(() => {});
+    }
+  }
+
+  unlockDecoder();
+  window.addEventListener('touchstart', unlockDecoder, { passive: true, once: true });
+  window.addEventListener('scroll', unlockDecoder, { passive: true, once: true });
+  window.addEventListener('click', unlockDecoder, { passive: true, once: true });
+
+  /**
+   * Loop de sincronização contínua de alta taxa de quadros (60fps)
+   * Utiliza reprodução ativa para avançar suavemente e seeking protegido para retorno
+   */
+  function syncEngineLoop() {
+    updateVideoDuration();
+    const current = video.currentTime;
+    const diff = targetTime - current;
+
+    // Se o usuário rolou para frente (avanço suave sem travar o decoder)
+    if (diff > 0.08) {
+      // Ajusta a velocidade de reprodução conforme a velocidade de rolagem (de 0.8x até 3.5x)
+      const speed = Math.min(Math.max(diff * 1.8, 0.8), 3.5);
+      video.playbackRate = speed;
+      
+      if (video.paused) {
+        const p = video.play();
+        if (p !== undefined) p.catch(() => {});
+      }
+    } 
+    // Se o usuário rolou para trás ou deu um salto grande
+    else if (diff < -0.15) {
+      if (!video.paused) {
+        video.pause();
+      }
+      
+      if (!isSeeking) {
+        isSeeking = true;
+        try {
+          video.currentTime = Math.max(targetTime, 0.001);
+        } catch (e) {
+          isSeeking = false;
+        }
+      }
+    } 
+    // Quando atinge o ponto exato da seção
+    else {
+      if (!video.paused && Math.abs(diff) < 0.05) {
+        video.pause();
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(syncEngineLoop);
+  }
+
   video.addEventListener('seeked', () => {
-    clearTimeout(seekTimeout);
     isSeeking = false;
-    performSeek();
   });
 
-  // Atualiza duração
-  function setDuration() {
-    if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-      duration = video.duration;
-    }
-  }
+  // Inicia o motor de sincronização
+  animationFrameId = requestAnimationFrame(syncEngineLoop);
 
-  // Inicialização de ScrollTrigger
-  function initScrolly() {
-    setDuration();
+  /**
+   * Conecta o GSAP ScrollTrigger ao progresso do documento
+   */
+  function setupScrollTrigger() {
+    updateVideoDuration();
 
     ScrollTrigger.create({
       trigger: mainFlow,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.5,
+      scrub: true,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        setDuration();
-        const maxTime = Math.max(duration - 0.05, 0.1);
-        targetTime = Math.min(Math.max(self.progress * maxTime, 0.001), maxTime);
-        performSeek();
+        updateVideoDuration();
+        const maxTime = Math.max(videoDuration - 0.08, 0.1);
+        targetTime = Math.min(Math.max(self.progress * maxTime, 0), maxTime);
       }
     });
 
@@ -104,28 +149,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.refresh();
   }
 
-  // Garante que o decoder de vídeo seja destravado
-  const unlock = () => {
-    const p = video.play();
-    if (p !== undefined) {
-      p.then(() => video.pause()).catch(() => {});
-    }
-  };
-  unlock();
-  window.addEventListener('touchstart', unlock, { passive: true, once: true });
-  window.addEventListener('scroll', unlock, { passive: true, once: true });
+  setupScrollTrigger();
 
-  initScrolly();
+  video.addEventListener('loadedmetadata', setupScrollTrigger);
+  video.addEventListener('canplay', setupScrollTrigger);
+  video.addEventListener('durationchange', setupScrollTrigger);
 
-  video.addEventListener('loadedmetadata', () => {
-    initScrolly();
-  });
-
-  video.addEventListener('canplay', () => {
-    initScrolly();
-  });
-
-  // Observador de seções para o menu
+  /**
+   * Observador para destacar links do menu conforme a seção ativa
+   */
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -144,6 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   sections.forEach((section) => observer.observe(section));
 
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  window.addEventListener('resize', () => ScrollTrigger.refresh());
+  // Cliques suaves nos itens do menu
+  navItems.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = item.getAttribute('href');
+      const targetElem = document.querySelector(targetId);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  window.addEventListener('load', () => {
+    updateVideoDuration();
+    ScrollTrigger.refresh();
+  });
+
+  window.addEventListener('resize', () => {
+    ScrollTrigger.refresh();
+  });
 });
