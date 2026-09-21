@@ -1,13 +1,13 @@
 /**
  * ==========================================================================
  * TIAGO HIGIENIZAÇÃO - EXPERIÊNCIA CINEMATOGRÁFICA SCROLLYTELLING
- * Controle ultra-fluido de vídeo na memória (Blob Object URL + GSAP ScrollTrigger)
+ * Controle ultra-fluido de vídeo sincronizado ao scroll (GSAP + ScrollTrigger)
  * ==========================================================================
  */
 
 gsap.registerPlugin(ScrollTrigger);
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const video = document.getElementById('scrolly-video');
   const mainFlow = document.querySelector('.scrolly-main-flow');
   const sections = document.querySelectorAll('.flow-section');
@@ -17,97 +17,87 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Garante propriedades ideais de reprodução
   video.muted = true;
+  video.defaultMuted = true;
   video.playsInline = true;
   video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
   video.pause();
 
-  /**
-   * 1. Carregamento do MP4 em memória via Blob Object URL
-   * Elimina requisições HTTP parciais (byte-range) a cada mudança de currentTime
-   */
-  async function loadVideoBlob() {
-    const candidateUrls = [
-      'videos/higienizacao-veicular.webm',
-      '/videos/higienizacao-veicular.webm',
-      'videos/higienizacao-veicular.mp4',
-      '/videos/higienizacao-veicular.mp4'
-    ];
+  // Variáveis de controle de interpolação suave
+  let targetProgress = 0;
+  let currentProgress = 0;
+  let videoDuration = 10; // Duração fallback até carregar metadados
+  let isInitialized = false;
 
-    for (const url of candidateUrls) {
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const blob = await response.blob();
-          const objectUrl = URL.createObjectURL(blob);
-          
-          // Aplica o Blob no vídeo
-          video.src = objectUrl;
-          video.load();
-          return true;
-        }
-      } catch (err) {
-        // Tenta próxima URL candidata
-      }
+  // Atualiza a duração real assim que disponível
+  function updateDuration() {
+    if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+      videoDuration = video.duration;
     }
-    return false;
   }
 
-  /**
-   * 2. Inicialização do Scrollytelling de Alta Fluidez
-   */
-  function setupFluidScrolly() {
-    video.pause();
-    const duration = video.duration || 10;
-    
-    let targetTime = 0;
-    let isSeeking = false;
-    let rafId = null;
+  video.addEventListener('loadedmetadata', updateDuration);
+  video.addEventListener('durationchange', updateDuration);
+  video.addEventListener('canplay', updateDuration);
 
-    // Render loop otimizado com requestAnimationFrame para evitar gargalos do decoder
-    function renderVideoFrame() {
-      if (!isSeeking && video.readyState >= 2) {
-        const diff = targetTime - video.currentTime;
-        if (Math.abs(diff) > 0.015) {
-          isSeeking = true;
-          try {
-            if ('fastSeek' in video) {
-              video.fastSeek(targetTime);
-            } else {
-              video.currentTime = targetTime;
-            }
-          } catch (e) {
-            video.currentTime = targetTime;
-          }
+  // Inicializa o decodificador de vídeo (warmup para destravar frames em todos os browsers)
+  const warmUpDecoder = () => {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          video.pause();
+        })
+        .catch(() => {
+          // Autoplay sem interação pode falhar em alguns navegadores, fallback silencioso
+        });
+    }
+  };
+  warmUpDecoder();
+
+  /**
+   * Inicialização do Scrollytelling com GSAP ScrollTrigger
+   */
+  function initScrollyEngine() {
+    if (isInitialized) return;
+    isInitialized = true;
+    updateDuration();
+
+    // ScrollTrigger principal acoplado ao fluxo da página
+    ScrollTrigger.create({
+      trigger: mainFlow,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        targetProgress = self.progress;
+      }
+    });
+
+    // Loop de renderização fluida com interpolação contínua (Lerp)
+    function renderLoop() {
+      // Interpolação suave (fator 0.12 para movimento natural e cinematográfico)
+      currentProgress += (targetProgress - currentProgress) * 0.12;
+
+      const targetTime = currentProgress * videoDuration;
+
+      // Aplica o tempo ao vídeo quando houver diferença perceptível
+      if (Math.abs(video.currentTime - targetTime) > 0.02) {
+        try {
+          const clampedTime = Math.min(Math.max(targetTime, 0.001), videoDuration - 0.05);
+          video.currentTime = clampedTime;
+        } catch (err) {
+          // Proteção contra chamadas antes do buffer estar pronto
         }
       }
-      rafId = requestAnimationFrame(renderVideoFrame);
+
+      requestAnimationFrame(renderLoop);
     }
 
-    // Libera a trava de seek assim que o frame é decodificado
-    video.addEventListener('seeked', () => {
-      isSeeking = false;
-    });
+    requestAnimationFrame(renderLoop);
 
-    // Inicia o render loop
-    renderVideoFrame();
-
-    // GSAP Timeline com ScrollTrigger acoplado às 5 seções
-    const progressProxy = { val: 0 };
-
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: mainFlow,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1.2, // Scrub mais suave e estendido para maior tempo de apreciação do vídeo
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          targetTime = Math.min(Math.max(self.progress * duration, 0), duration - 0.05);
-        }
-      }
-    });
-
-    // Desaparecimento suave do mapa ao rolar para o final (revelação total do carro)
+    // Desaparecimento suave do card de localização ao rolar
     const mapCard = document.querySelector('.location-snapshot-card');
     if (mapCard) {
       gsap.to(mapCard, {
@@ -125,28 +115,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Força atualização das dimensões e triggers
     ScrollTrigger.refresh();
   }
 
-  // Executa o carregamento em memória como Blob
-  const loadedAsBlob = await loadVideoBlob();
+  // Inicializa imediatamente o engine
+  initScrollyEngine();
 
-  // Aguarda os metadados do vídeo antes de inicializar o ScrollTrigger
-  if (video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
-    setupFluidScrolly();
+  // Recalibra quando os metadados chegarem
+  if (video.readyState >= 1) {
+    updateDuration();
+    ScrollTrigger.refresh();
   } else {
-    video.addEventListener('loadedmetadata', setupFluidScrolly, { once: true });
-    // Fallback de canplay
-    video.addEventListener('canplay', () => {
-      if (video.duration && !isNaN(video.duration)) {
-        setupFluidScrolly();
-      }
-    }, { once: true });
+    video.addEventListener('loadedmetadata', () => {
+      updateDuration();
+      ScrollTrigger.refresh();
+    });
   }
 
   /**
-   * 3. Sincronização de etapas no cabeçalho fixo
+   * Sincronização de etapas no menu de navegação
    */
   const observerOptions = {
     root: null,
@@ -172,16 +159,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   sections.forEach((section) => observer.observe(section));
 
-  // Recalibra ScrollTrigger no carregamento final e redimensionamento
+  // Recalibrações em eventos de ciclo de vida da janela
   window.addEventListener('load', () => {
-    if (typeof ScrollTrigger !== 'undefined') {
-      ScrollTrigger.refresh();
-    }
+    updateDuration();
+    ScrollTrigger.refresh();
   });
 
   window.addEventListener('resize', () => {
-    if (typeof ScrollTrigger !== 'undefined') {
-      ScrollTrigger.refresh();
-    }
+    ScrollTrigger.refresh();
   });
 });
