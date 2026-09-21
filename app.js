@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
  * TIAGO HIGIENIZAÇÃO - EXPERIÊNCIA CINEMATOGRÁFICA SCROLLYTELLING
- * Sincronização Absoluta 1:1 do Vídeo com o Scroll (Início ao Fim da Página)
+ * Sincronização Contínua e Fluida 1:1 do Vídeo do Topo ao Fim da Página
  * ==========================================================================
  */
 
@@ -15,55 +15,122 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!video || !mainFlow) return;
 
-  // Garante propriedades ideais para scrub sem som e inline
+  // Propriedades fundamentais para permitir reprodução sem som em todos os aparelhos
   video.muted = true;
   video.defaultMuted = true;
   video.playsInline = true;
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
+  video.loop = false;
   video.pause();
 
-  let scrubTween = null;
+  let targetProgress = 0;
+  let targetTime = 0;
+  let videoDuration = 10;
+  let isSeeking = false;
+  let animationFrameId = null;
 
-  function initScrollytelling() {
-    const rawDuration = video.duration;
-    const dur = (!rawDuration || isNaN(rawDuration) || rawDuration <= 0) ? 10 : rawDuration;
-
-    if (scrubTween) {
-      if (scrubTween.scrollTrigger) {
-        scrubTween.scrollTrigger.kill();
-      }
-      scrubTween.kill();
+  // Atualiza a duração real do vídeo assim que estiver pronta
+  function updateDuration() {
+    if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+      videoDuration = video.duration;
     }
+  }
 
-    // Cria a timeline de sincronização 1:1 (0s no topo -> final do vídeo no final do scroll)
-    scrubTween = gsap.fromTo(video, 
-      { currentTime: 0 },
-      {
-        currentTime: Math.max(dur - 0.05, 0.1),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: mainFlow,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 0.5, // Amortecimento suave de meio segundo
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            // Reforço direto de sincronização para todos os navegadores
-            if (video.duration && !isNaN(video.duration)) {
-              const target = self.progress * (video.duration - 0.05);
-              if (Math.abs(video.currentTime - target) > 0.06) {
-                try {
-                  video.currentTime = target;
-                } catch (e) {}
-              }
+  // Destrava o decodificador de vídeo para mobile e desktop
+  function unlockDecoder() {
+    updateDuration();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Breve pausa para manter os buffers abertos no hardware
+          setTimeout(() => {
+            if (targetProgress === 0 && video.currentTime < 0.2) {
+              video.pause();
             }
-          }
+          }, 150);
+        })
+        .catch(() => {});
+    }
+  }
+
+  unlockDecoder();
+  window.addEventListener('touchstart', unlockDecoder, { passive: true, once: true });
+  window.addEventListener('scroll', unlockDecoder, { passive: true, once: true });
+  window.addEventListener('click', unlockDecoder, { passive: true, once: true });
+
+  /**
+   * Loop de Renderização Contínua a 60fps
+   * Acompanha a rolagem do usuário do segundo 0:00 até o final do vídeo
+   */
+  function syncLoop() {
+    updateDuration();
+    const maxDuration = Math.max(videoDuration - 0.05, 0.1);
+    targetTime = targetProgress * maxDuration;
+    const current = video.currentTime;
+    const diff = targetTime - current;
+
+    // Rolando para frente: usa reprodução acelerada suave (sem travar decodificador)
+    if (diff > 0.05) {
+      // Velocidade adaptativa: quanto mais rápido rola, mais rápido o vídeo avança até alcançar a posição
+      const speed = Math.min(Math.max(diff * 2.2, 0.8), 4.0);
+      video.playbackRate = speed;
+      if (video.paused) {
+        const p = video.play();
+        if (p !== undefined) p.catch(() => {});
+      }
+    } 
+    // Rolando para trás: volta suavemente
+    else if (diff < -0.1) {
+      if (!video.paused) {
+        video.pause();
+      }
+      if (!isSeeking) {
+        isSeeking = true;
+        try {
+          video.currentTime = Math.max(targetTime, 0.001);
+        } catch (e) {
+          isSeeking = false;
         }
       }
-    );
+    } 
+    // Na posição exata da rolagem: pausa no frame correspondente
+    else {
+      if (!video.paused && Math.abs(diff) < 0.04) {
+        video.pause();
+      }
+    }
 
-    // Desaparecimento suave do card do mapa ao aproximar do final da página
+    animationFrameId = requestAnimationFrame(syncLoop);
+  }
+
+  video.addEventListener('seeked', () => {
+    isSeeking = false;
+  });
+
+  // Inicia o motor de animação
+  animationFrameId = requestAnimationFrame(syncLoop);
+
+  /**
+   * Conecta o ScrollTrigger ao início e fim da página
+   */
+  function setupScrollTrigger() {
+    updateDuration();
+
+    ScrollTrigger.create({
+      trigger: mainFlow,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        // self.progress vai estritamente de 0.0 (topo) até 1.0 (rodapé final)
+        targetProgress = self.progress;
+      }
+    });
+
+    // Desaparecimento suave do card do mapa ao aproximar do final
     const mapCard = document.querySelector('.location-snapshot-card');
     if (mapCard) {
       gsap.to(mapCard, {
@@ -84,29 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.refresh();
   }
 
-  // Destrava decodificador em dispositivos móveis no primeiro toque ou rolagem
-  const unlockDecoder = () => {
-    const p = video.play();
-    if (p !== undefined) {
-      p.then(() => video.pause()).catch(() => {});
-    }
-  };
-  unlockDecoder();
-  window.addEventListener('touchstart', unlockDecoder, { passive: true, once: true });
-  window.addEventListener('scroll', unlockDecoder, { passive: true, once: true });
-  window.addEventListener('click', unlockDecoder, { passive: true, once: true });
+  setupScrollTrigger();
 
-  // Inicializa imediatamente
-  initScrollytelling();
-
-  // Recalibra assim que metadados e buffers forem carregados
-  if (video.readyState >= 1) {
-    initScrollytelling();
-  } else {
-    video.addEventListener('loadedmetadata', initScrollytelling, { once: true });
-    video.addEventListener('canplay', initScrollytelling, { once: true });
-    video.addEventListener('loadeddata', initScrollytelling, { once: true });
-  }
+  video.addEventListener('loadedmetadata', setupScrollTrigger);
+  video.addEventListener('canplay', setupScrollTrigger);
+  video.addEventListener('durationchange', setupScrollTrigger);
 
   /**
    * Sincronização de etapas no menu de navegação
@@ -142,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('load', () => {
-    initScrollytelling();
+    updateDuration();
     ScrollTrigger.refresh();
   });
 
