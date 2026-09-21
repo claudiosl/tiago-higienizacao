@@ -66,6 +66,10 @@ body {
   pointer-events: none;
   overflow: hidden;
   background-color: var(--bg-core);
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .video-scrolly-element {
@@ -78,6 +82,9 @@ body {
   object-position: center;
   pointer-events: none;
   z-index: 1;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .video-scrolly-overlay {

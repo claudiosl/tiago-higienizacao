@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
  * TIAGO HIGIENIZAÇÃO - EXPERIÊNCIA CINEMATOGRÁFICA SCROLLYTELLING
- * Motor Híbrido de Reprodução Sincronizada com Scroll (Active Pipeline Engine)
+ * Motor Adaptativo Ultra-Otimizado (Dual-Mode: Mobile Fluid Loop + Desktop Scrolly)
  * ==========================================================================
  */
 
@@ -15,105 +15,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!video || !mainFlow) return;
 
-  // Garante propriedades ideais de vídeo sem som e inline
+  // Propriedades fundamentais de vídeo sem som e inline para máxima compatibilidade
   video.muted = true;
   video.defaultMuted = true;
   video.playsInline = true;
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
-  video.autoplay = false;
-  video.loop = false;
 
-  let targetTime = 0;
-  let videoDuration = 10;
-  let isSeeking = false;
-  let animationFrameId = null;
-
-  function updateVideoDuration() {
-    if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-      videoDuration = video.duration;
-    }
-  }
-
-  // Destravamento de decodificação para navegadores restritivos (iOS/Safari/Android)
-  function unlockDecoder() {
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          // Mantém vivo por uma fração de segundo para abrir os buffers de hardware
-          setTimeout(() => {
-            if (targetTime === 0 && Math.abs(video.currentTime) < 0.1) {
-              video.pause();
-            }
-          }, 150);
-        })
-        .catch(() => {});
-    }
-  }
-
-  unlockDecoder();
-  window.addEventListener('touchstart', unlockDecoder, { passive: true, once: true });
-  window.addEventListener('scroll', unlockDecoder, { passive: true, once: true });
-  window.addEventListener('click', unlockDecoder, { passive: true, once: true });
+  const isTouchOrMobile = () => {
+    return window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  };
 
   /**
-   * Loop de sincronização contínua de alta taxa de quadros (60fps)
-   * Utiliza reprodução ativa para avançar suavemente e seeking protegido para retorno
+   * 📱 MODO MOBILE: Reprodução Contínua Fluida 60fps
+   * Elimina o processamento excessivo de CPU/GPU em smartphones,
+   * mantendo a rolagem 100% lisa e o vídeo cinematográfico em segundo plano.
    */
-  function syncEngineLoop() {
-    updateVideoDuration();
-    const current = video.currentTime;
-    const diff = targetTime - current;
+  function initMobileMode() {
+    video.loop = true;
+    video.playbackRate = 1.0;
 
-    // Se o usuário rolou para frente (avanço suave sem travar o decoder)
-    if (diff > 0.08) {
-      // Ajusta a velocidade de reprodução conforme a velocidade de rolagem (de 0.8x até 3.5x)
-      const speed = Math.min(Math.max(diff * 1.8, 0.8), 3.5);
-      video.playbackRate = speed;
-      
-      if (video.paused) {
-        const p = video.play();
-        if (p !== undefined) p.catch(() => {});
+    const startMobilePlay = () => {
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {});
       }
-    } 
-    // Se o usuário rolou para trás ou deu um salto grande
-    else if (diff < -0.15) {
-      if (!video.paused) {
-        video.pause();
+    };
+
+    startMobilePlay();
+    window.addEventListener('touchstart', startMobilePlay, { passive: true, once: true });
+    window.addEventListener('scroll', startMobilePlay, { passive: true, once: true });
+  }
+
+  /**
+   * 💻 MODO DESKTOP: Sincronização Progressiva com Scroll
+   */
+  function initDesktopMode() {
+    video.loop = false;
+    let targetTime = 0;
+    let videoDuration = 10;
+    let isSeeking = false;
+    let rafId = null;
+
+    function updateDuration() {
+      if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+        videoDuration = video.duration;
       }
-      
-      if (!isSeeking) {
-        isSeeking = true;
-        try {
-          video.currentTime = Math.max(targetTime, 0.001);
-        } catch (e) {
-          isSeeking = false;
+    }
+
+    const unlock = () => {
+      const p = video.play();
+      if (p !== undefined) {
+        p.then(() => {
+          setTimeout(() => {
+            if (targetTime === 0) video.pause();
+          }, 100);
+        }).catch(() => {});
+      }
+    };
+    unlock();
+
+    function desktopLoop() {
+      updateDuration();
+      const current = video.currentTime;
+      const diff = targetTime - current;
+
+      if (diff > 0.08) {
+        const speed = Math.min(Math.max(diff * 1.8, 0.8), 3.0);
+        video.playbackRate = speed;
+        if (video.paused) {
+          const p = video.play();
+          if (p !== undefined) p.catch(() => {});
+        }
+      } else if (diff < -0.15) {
+        if (!video.paused) video.pause();
+        if (!isSeeking) {
+          isSeeking = true;
+          try {
+            video.currentTime = Math.max(targetTime, 0.001);
+          } catch (e) {
+            isSeeking = false;
+          }
+        }
+      } else {
+        if (!video.paused && Math.abs(diff) < 0.05) {
+          video.pause();
         }
       }
-    } 
-    // Quando atinge o ponto exato da seção
-    else {
-      if (!video.paused && Math.abs(diff) < 0.05) {
-        video.pause();
-      }
+
+      rafId = requestAnimationFrame(desktopLoop);
     }
 
-    animationFrameId = requestAnimationFrame(syncEngineLoop);
-  }
+    video.addEventListener('seeked', () => {
+      isSeeking = false;
+    });
 
-  video.addEventListener('seeked', () => {
-    isSeeking = false;
-  });
-
-  // Inicia o motor de sincronização
-  animationFrameId = requestAnimationFrame(syncEngineLoop);
-
-  /**
-   * Conecta o GSAP ScrollTrigger ao progresso do documento
-   */
-  function setupScrollTrigger() {
-    updateVideoDuration();
+    rafId = requestAnimationFrame(desktopLoop);
 
     ScrollTrigger.create({
       trigger: mainFlow,
@@ -122,41 +119,43 @@ document.addEventListener('DOMContentLoaded', () => {
       scrub: true,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        updateVideoDuration();
+        updateDuration();
         const maxTime = Math.max(videoDuration - 0.08, 0.1);
         targetTime = Math.min(Math.max(self.progress * maxTime, 0), maxTime);
       }
     });
 
-    // Desaparecimento suave do card do mapa
-    const mapCard = document.querySelector('.location-snapshot-card');
-    if (mapCard) {
-      gsap.to(mapCard, {
-        opacity: 0,
-        y: -40,
-        scale: 0.96,
-        pointerEvents: 'none',
-        ease: 'power1.out',
-        scrollTrigger: {
-          trigger: mapCard,
-          start: 'top 30%',
-          end: 'bottom 5%',
-          scrub: 1.2
-        }
-      });
-    }
-
-    ScrollTrigger.refresh();
+    video.addEventListener('loadedmetadata', updateDuration);
+    video.addEventListener('canplay', updateDuration);
   }
 
-  setupScrollTrigger();
+  // Inicializa o modo ideal para o dispositivo atual
+  if (isTouchOrMobile()) {
+    initMobileMode();
+  } else {
+    initDesktopMode();
+  }
 
-  video.addEventListener('loadedmetadata', setupScrollTrigger);
-  video.addEventListener('canplay', setupScrollTrigger);
-  video.addEventListener('durationchange', setupScrollTrigger);
+  // Desaparecimento suave do card do mapa ao rolar
+  const mapCard = document.querySelector('.location-snapshot-card');
+  if (mapCard) {
+    gsap.to(mapCard, {
+      opacity: 0,
+      y: -40,
+      scale: 0.96,
+      pointerEvents: 'none',
+      ease: 'power1.out',
+      scrollTrigger: {
+        trigger: mapCard,
+        start: 'top 30%',
+        end: 'bottom 5%',
+        scrub: 1.2
+      }
+    });
+  }
 
   /**
-   * Observador para destacar links do menu conforme a seção ativa
+   * Sincronização de etapas no menu de navegação
    */
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -188,12 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  window.addEventListener('load', () => {
-    updateVideoDuration();
-    ScrollTrigger.refresh();
-  });
-
-  window.addEventListener('resize', () => {
-    ScrollTrigger.refresh();
-  });
+  window.addEventListener('load', () => ScrollTrigger.refresh());
+  window.addEventListener('resize', () => ScrollTrigger.refresh());
 });
